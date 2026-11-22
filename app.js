@@ -5,7 +5,6 @@ import {
 import {
   getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-functions.js';
 
 // Public Firebase web config. Firebase API keys identify the project; access is controlled by Auth + Rules.
 const firebaseConfig = {
@@ -21,16 +20,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const functions = getFunctions(app, 'us-central1');
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
+// Replace this URL after deploying the API as a Render Web Service.
+// Example: https://collectomon-api.onrender.com
+const API_BASE_URL = 'https://YOUR-SERVICE-NAME.onrender.com';
+
+async function callGameApi(route, body = {}) {
+  if (API_BASE_URL.includes('YOUR-SERVICE-NAME')) {
+    throw new Error('The Render API URL has not been configured in app.js yet.');
+  }
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error('Please sign in with Google again.');
+  const idToken = await currentUser.getIdToken();
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/${route}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+      body: JSON.stringify(body),
+      cache: 'no-store'
+    });
+  } catch (error) {
+    throw new Error(`Could not reach the game server. It may be waking up on Render; please try again in about a minute. (${error.message})`);
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = payload?.error?.message || `Game server request failed (${response.status}).`;
+    throw new Error(message);
+  }
+  return { data: payload.data };
+}
+
 const api = {
-  initializePlayer: httpsCallable(functions, 'initializePlayer'),
-  fuseMonsters: httpsCallable(functions, 'fuseMonsters'),
-  startBotBattle: httpsCallable(functions, 'startBotBattle'),
-  battleTurn: httpsCallable(functions, 'battleTurn'),
-  openRoboPack: httpsCallable(functions, 'openRoboPack')
+  initializePlayer: () => callGameApi('initializePlayer'),
+  fuseMonsters: data => callGameApi('fuseMonsters', data),
+  startBotBattle: data => callGameApi('startBotBattle', data),
+  battleTurn: data => callGameApi('battleTurn', data),
+  openRoboPack: () => callGameApi('openRoboPack')
 };
 
 const MONS = {
@@ -179,7 +210,7 @@ onAuthStateChanged(auth, async user => {
     console.error('Player initialization failed:', error);
     await signOut(auth).catch(() => {});
     showAuth();
-    showAuthError(`Could not load your saved world: ${error.message || 'Unknown error'}. Check that Firestore and Cloud Functions are deployed, then sign in again.`);
+    showAuthError(`Could not load your saved world: ${error.message || 'Unknown error'}. Check that your Render game API is deployed and its URL is configured in app.js, then sign in again.`);
   }
 });
 

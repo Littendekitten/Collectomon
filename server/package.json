@@ -1,0 +1,18 @@
+{
+  "name": "collectomon-render-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Server-authoritative Collectomon game API for Render, backed by Firebase Auth and Firestore.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "check": "node --check src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase-admin": "^13.4.0"
+  }
+}

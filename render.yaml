@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: collectomon-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: kitacat-collectomon
+      - key: FIREBASE_SERVICE_ACCOUNT_FILE
+        value: /etc/secrets/firebase-service-account.json
+      - key: ALLOWED_ORIGINS
+        value: https://littendekitten.github.io
