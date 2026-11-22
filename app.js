@@ -25,7 +25,7 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 // Replace this URL after deploying the API as a Render Web Service.
 // Example: https://collectomon-api.onrender.com
-const API_BASE_URL = 'https://YOUR-SERVICE-NAME.onrender.com';
+const API_BASE_URL = 'https://collectomon-api.onrender.com';
 
 async function callGameApi(route, body = {}) {
   if (API_BASE_URL.includes('YOUR-SERVICE-NAME')) {
