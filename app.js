@@ -1,7 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js';
 import {
-  getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged,
-  setPersistence, browserLocalPersistence, signOut
+  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
 import {
   getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc
@@ -25,9 +24,6 @@ const db = getFirestore(app);
 const functions = getFunctions(app, 'us-central1');
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
-
-// Surface redirect errors (for example an unauthorized hosting domain) on the login screen.
-getRedirectResult(auth).catch(error => showAuthError(authMessage(error)));
 
 const api = {
   initializePlayer: httpsCallable(functions, 'initializePlayer'),
@@ -116,20 +112,23 @@ function setFavicon() {
   $('#favicon').href = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-// Auth is mandatory. Until Firebase confirms a Google user, the game is covered by the login screen.
+// Auth is mandatory. A popup is more reliable on GitHub Pages than redirect auth,
+// which can be interrupted by browsers' cross-site storage protections. Keep the
+// signInWithPopup call directly inside the click handler so browsers allow the popup.
 $('#google-sign-in').addEventListener('click', async () => {
   showAuthError('');
   const button = $('#google-sign-in');
+  const label = button.querySelector('span:last-child');
   button.disabled = true;
-  button.querySelector('span:last-child').textContent = 'Opening Google...';
+  label.textContent = 'Connecting to Google...';
   try {
-    await setPersistence(auth, browserLocalPersistence);
-    await signInWithRedirect(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
+    // onAuthStateChanged loads the player's saved world after Firebase completes sign-in.
   } catch (error) {
-    console.error(error);
+    console.error('Google sign-in failed:', error);
     showAuthError(authMessage(error));
     button.disabled = false;
-    button.querySelector('span:last-child').textContent = 'Continue with Google';
+    label.textContent = 'Continue with Google';
   }
 });
 $('#sign-out-button').addEventListener('click', async () => {
@@ -138,8 +137,13 @@ $('#sign-out-button').addEventListener('click', async () => {
 
 function authMessage(error) {
   const code = error?.code || '';
-  if (code.includes('unauthorized-domain')) return 'This website domain is not authorized in Firebase Authentication settings.';
-  if (code.includes('popup-blocked')) return 'Google sign-in was blocked. Please try again.';
+  if (code.includes('unauthorized-domain')) return 'This site is not authorized yet. In Firebase Console, open Authentication → Settings → Authorized domains and add littendekitten.github.io.';
+  if (code.includes('operation-not-allowed')) return 'Google sign-in is not enabled. In Firebase Console, open Authentication → Sign-in method and enable Google.';
+  if (code.includes('popup-blocked')) return 'Your browser blocked the Google sign-in window. Allow pop-ups for littendekitten.github.io, then try again.';
+  if (code.includes('popup-closed-by-user')) return 'The Google sign-in window was closed before sign-in finished. You can try again.';
+  if (code.includes('cancelled-popup-request')) return 'A sign-in window is already opening. Finish that window or try again.';
+  if (code.includes('network-request-failed')) return 'Could not reach Google or Firebase. Check your connection and try again.';
+  if (code.includes('invalid-api-key')) return 'Firebase rejected the web API key. Check the Firebase configuration in app.js.';
   return error?.message || 'Sign-in failed. Please try again.';
 }
 
