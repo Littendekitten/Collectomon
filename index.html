@@ -1,1 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eef6ff">
+  <title>Collectomon — Catch, craft and hang out</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#home" aria-label="Collectomon home">
+        <span class="brand-mark">C</span>
+        <span class="brand-name">Collectomon<small>CREATURE WORLD</small></span>
+      </a>
+      <div class="side-label">YOUR WORLD</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" type="button" data-view="home"><span class="nav-icon">⌂</span><span>My Home</span></button>
+        <button class="nav-link" type="button" data-view="collection"><span class="nav-icon">▧</span><span>Collection</span><span class="nav-count" id="nav-card-count">3</span></button>
+        <button class="nav-link" type="button" data-view="kitchen"><span class="nav-icon">♨</span><span>Kitchen Lab</span><span class="nav-new">NEW</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="daily-card">
+          <div class="daily-icon">💡</div>
+          <div class="daily-title">Trainer tip</div>
+          <p>Drag creatures from your collection into the meadow. They will wander and chat on their own.</p>
+        </div>
+        <div class="profile-row">
+          <div class="profile-avatar">LC</div>
+          <div class="profile-copy"><strong>Little Collector</strong><span>Rookie trainer</span></div>
+          <span class="profile-menu" aria-hidden="true">•••</span>
+        </div>
+      </div>
+    </aside>
 
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb"><span>YOUR WORLD</span><b>/</b><strong id="page-name">MY HOME</strong></div>
+        <div class="topbar-right">
+          <div class="currency-pill"><span class="coin-icon">●</span><span id="crumb-count">75</span><span class="currency-name">crumbs</span></div>
+          <div class="top-avatar" title="Little Collector">LC</div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-home">
+        <div class="welcome-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> YOUR LITTLE CORNER OF THE WORLD</div>
+            <h1>Welcome back,<br><em>Collector!</em></h1>
+            <p class="subheading">Your creatures have been waiting. See what they are up to.</p>
+          </div>
+          <div class="weather-chip"><span>☀️</span><div><strong>Sunny meadow</strong><small>A perfect day to play</small></div></div>
+        </div>
+
+        <div class="habitat-heading">
+          <div><div class="section-kicker">THE HANGOUT</div><h2>Monster Meadow <span class="live-indicator"><i></i> LIVE</span></h2></div>
+          <div class="habitat-meta"><span>●</span> <b id="habitat-occupancy">2</b> creatures wandering</div>
+        </div>
+
+        <div class="meadow-world" id="meadow-world" aria-label="Monster Meadow. Drop creatures here or drag creatures around.">
+          <div class="meadow-sun"></div>
+          <div class="meadow-cloud cloud-one"></div><div class="meadow-cloud cloud-two"></div>
+          <div class="distant-hill hill-one"></div><div class="distant-hill hill-two"></div>
+          <div class="meadow-tree tree-one"><span>🌳</span></div><div class="meadow-tree tree-two"><span>🌲</span></div>
+          <div class="meadow-bush bush-one">🌼</div><div class="meadow-bush bush-two">🌷</div><div class="meadow-bush bush-three">🌻</div>
+          <div class="meadow-path"></div>
+          <div class="meadow-grass grass-one">〰</div><div class="meadow-grass grass-two">〰</div><div class="meadow-grass grass-three">〰</div>
+          <div class="meadow-creatures" id="meadow-creatures"></div>
+          <div class="meadow-drop-hint" id="meadow-drop-hint"><span>＋</span><b>Drop your creatures here</b><small>Drag a card from your collection to bring it to life</small></div>
+          <div class="meadow-label">MONSTER MEADOW</div>
+        </div>
+        <div class="habitat-hint"><span class="hint-icon">↗</span><span><b>It's a big open meadow!</b> Drag creatures to bring them in, then drag them around to choose where they wander.</span><button class="text-button" type="button" data-view="collection">Open collection <span>→</span></button></div>
+
+        <div class="home-lower-grid">
+          <section class="panel pals-panel">
+            <div class="panel-heading"><div><div class="section-kicker">YOUR LITTLE CREW</div><h3>Who's around?</h3></div><button class="icon-button" type="button" data-view="collection" aria-label="Open collection">↗</button></div>
+            <div id="home-roster" class="home-roster"></div>
+          </section>
+          <section class="panel activity-panel">
+            <div class="panel-heading"><div><div class="section-kicker">MEADOW MOMENTS</div><h3>What's happening?</h3></div><span class="activity-live"><i></i> LIVE CHAT</span></div>
+            <div class="activity-feed" id="activity-feed" aria-live="polite"></div>
+            <button class="snack-button" type="button" id="snack-button"><span>♡</span> Give everyone a little cheer</button>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-collection">
+        <div class="page-intro collection-intro">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> EVERY CREATURE HAS A STORY</div><h1>Your <em>collection.</em></h1><p class="subheading">Meet your growing crew of curious little creatures.</p></div>
+          <div class="collection-summary"><span class="summary-icon">▧</span><div><strong id="collection-total">3 cards</strong><small>in your collection</small></div></div>
+        </div>
+        <div class="collection-toolbar">
+          <div class="filter-tabs" role="group" aria-label="Filter cards">
+            <button class="filter-tab active" type="button" data-filter="all">All creatures <span id="filter-all-count">3</span></button>
+            <button class="filter-tab" type="button" data-filter="snack">Snack pals</button>
+            <button class="filter-tab" type="button" data-filter="nature">Nature pals</button>
+          </div>
+          <label class="sort-label">SORT BY <select id="sort-cards" aria-label="Sort cards"><option value="newest">Recently found</option><option value="name">Name A–Z</option><option value="power">Power</option></select></label>
+        </div>
+        <div class="card-grid" id="collection-grid"></div>
+        <section class="pack-banner">
+          <div class="pack-art"><span class="pack-sticker">?</span><span class="pack-ribbon">MYSTERY<br>FRIENDS</span></div>
+          <div class="pack-copy"><div class="section-kicker">A LITTLE SURPRISE</div><h2>Somebody new is waiting.</h2><p>Crack open a Mystery Pack and welcome three new creatures to your collection.</p></div>
+          <button class="primary-button" type="button" id="open-pack-button"><span>＋</span> Open a pack <b>35</b><small>crumbs</small></button>
+        </section>
+      </section>
+
+      <section class="view" id="view-kitchen">
+        <div class="page-intro kitchen-intro">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> EXPERIMENT, MIX, DISCOVER</div><h1>The <em>Kitchen Lab.</em></h1><p class="subheading">A pinch of this, a little bit of that... who knows what you'll make?</p></div>
+          <div class="lab-sticker"><span>🧪</span><small>GOOD THINGS<br>ARE COOKING</small></div>
+        </div>
+        <div class="kitchen-layout">
+          <section class="panel cooking-panel">
+            <div class="panel-heading"><div><div class="section-kicker">THE COOKING COUNTER</div><h3>Let's make something!</h3></div><span class="recipe-status" id="recipe-status">WAITING FOR YOU</span></div>
+            <div class="counter-scene" id="counter-scene">
+              <div class="counter-window"><span class="window-sun">☀️</span><span class="window-plant">🪴</span></div>
+              <div class="counter-shelf"><span>🌿</span><span>🫙</span><span>🌿</span></div>
+              <div class="countertop"></div>
+              <div class="pan-area" id="pan-area">
+                <div class="pan-placeholder" id="pan-placeholder"><span class="pan-outline">🍳</span><b>Your pan goes here</b><small>Use the Little Pan from your item basket</small></div>
+                <div class="pan-visual hidden" id="pan-visual"><div class="pan-handle"></div><div class="pan-body"><div class="pan-shine"></div><div id="pan-contents" class="pan-contents"><span class="pan-empty-label">ready to cook</span></div></div><div class="pan-label" id="pan-label">EMPTY PAN</div></div>
+              </div>
+              <div class="counter-deco deco-cup">🥛</div><div class="counter-deco deco-jar">🧂</div>
+            </div>
+            <div class="cooking-instructions" id="cooking-instructions"><span class="instruction-number">01</span><p><b>First, set down your pan.</b><br>Use it from your item basket to start cooking.</p></div>
+            <div class="cooking-actions" id="cooking-actions"></div>
+          </section>
+          <aside class="kitchen-side">
+            <section class="panel inventory-panel">
+              <div class="panel-heading"><div><div class="section-kicker">YOUR SUPPLIES</div><h3>Item basket</h3></div><span class="basket-count" id="basket-count">3 items</span></div>
+              <p class="inventory-note">Tap an item to use it at the counter.</p>
+              <div class="inventory-list" id="inventory-list"></div>
+            </section>
+            <section class="panel recipe-book">
+              <div class="panel-heading"><div><div class="section-kicker">A KNOWN RECIPE</div><h3>Recipe notebook</h3></div><span class="book-icon">▤</span></div>
+              <div class="recipe-card"><div class="recipe-ingredients"><span>🧈</span><b>+</b><span>🦞</span><b>→</b><span>🦞</span></div><div class="recipe-copy"><strong>ButterLobster</strong><small>Butter + Lobster · Pan required</small></div><span class="recipe-tag" id="recipe-tag">DISCOVERED</span></div>
+              <p class="recipe-footnote">The best discoveries happen when you try things. More recipes are waiting to be found.</p>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <footer class="app-footer"><span>COLLECTOMON</span><span>A tiny world of big personalities.</span><span class="prototype-note">PROTOTYPE · PROGRESS RESETS ON REFRESH</span></footer>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <div class="modal-backdrop hidden" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card" id="modal-card"><button class="modal-close" type="button" id="modal-close" aria-label="Close">×</button><div id="modal-content"></div></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
